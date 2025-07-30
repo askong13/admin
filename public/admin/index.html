@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <title>Storapedia Admin Dashboard</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+    :root{--primary-blue:#00A6FB;--secondary-blue:#0582CA;--dark-text:#1F2937;--light-bg:#F9FAFB;--border-color:#E5E7EB}body{font-family:Inter,sans-serif;color:var(--dark-text);background-color:var(--light-bg);min-height:100vh;display:flex;flex-direction:column}.btn-primary{background-color:var(--primary-blue);color:#fff;transition:all .3s ease;box-shadow:0 4px 6px -1px rgba(0,0,0,.1),0 2px 4px -2px rgba(0,0,0,.1)}.btn-primary:hover:not(:disabled){background-color:var(--secondary-blue);transform:translateY(-1px);box-shadow:0 10px 15px -3px rgba(0,0,0,.1),0 4px 6px -4px rgba(0,0,0,.1)}.btn-primary:disabled{background-color:#94a3b8;cursor:not-allowed}.sidebar{width:250px;min-width:250px;transition:transform .3s ease-in-out;transform:translateX(0);box-shadow:2px 0 5px rgba(0,0,0,.1)}.sidebar.hidden-mobile{transform:translateX(-100%)}@media (min-width:1024px){.sidebar.hidden-mobile{transform:translateX(0)}}.sidebar-link.active-link{background-color:#4a5568;color:#fff}.main-content-area{flex-grow:1}.section-content{display:none}.section-content.active{display:block;animation:fadeIn .5s ease-out}@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+    </style>
+</head>
+<body class="flex flex-col lg:flex-row min-h-screen">
+    <div id="login-modal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-[100]">
+        <div class="bg-white p-8 rounded-lg shadow-xl w-full max-w-md relative">
+            <h2 class="text-2xl font-bold text-center mb-6">Admin Login</h2>
+            <form id="admin-login-form" class="space-y-4">
+                <div><label for="admin-email" class="block text-sm font-medium text-gray-700">Email</label> <input type="email" id="admin-email" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required></div>
+                <div><label for="admin-password" class="block text-sm font-medium text-gray-700">Password</label> <input type="password" id="admin-password" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm" required></div>
+                <button type="submit" id="admin-login-btn" class="w-full btn-primary py-2 rounded-md font-semibold">Login</button>
+            </form>
+        </div>
+    </div>
+    <aside id="sidebar" class="sidebar bg-gray-800 text-white flex-shrink-0 lg:flex flex-col fixed inset-y-0 left-0 z-50 overflow-y-auto hidden-mobile">
+        <div class="p-6 flex items-center justify-between lg:justify-center border-b border-gray-700">
+            <h1 class="text-2xl font-bold tracking-tight text-[var(--primary-blue)]">ADMIN PANEL</h1>
+        </div>
+        <nav class="flex-grow p-4">
+            <ul class="space-y-2">
+                <li><a href="#" data-section="dashboard" class="sidebar-link block py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-tachometer-alt mr-2"></i> Dashboard</a></li>
+                <li><a href="#" data-section="locations" class="sidebar-link block py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-map-marker-alt mr-2"></i> Locations</a></li>
+                <li><a href="#" data-section="bookings" class="sidebar-link block py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-calendar-check mr-2"></i> Bookings</a></li>
+                <li><a href="#" data-section="qr-scanner" class="sidebar-link block py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-qrcode mr-2"></i> QR Scanner</a></li>
+                <li><a href="#" data-section="users" class="sidebar-link block py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-users mr-2"></i> Users</a></li>
+                <li><a href="#" data-section="messages" class="sidebar-link block py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-envelope mr-2"></i> Messages</a></li>
+                <li><a href="#" data-section="faqs-management" class="sidebar-link block py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-question-circle mr-2"></i> FAQs</a></li>
+                <li><a href="#" data-section="vouchers-management" class="sidebar-link block py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-ticket-alt mr-2"></i> Vouchers</a></li>
+                <li><a href="#" data-section="settings" class="sidebar-link block py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-cogs mr-2"></i> Settings</a></li>
+                <li><button id="admin-logout-btn" class="w-full text-left py-2 px-4 rounded-md text-gray-300 hover:bg-gray-700 hover:text-white"><i class="fas fa-sign-out-alt mr-2"></i> Logout</button></li>
+            </ul>
+        </nav>
+    </aside>
+    <div class="main-content-area flex-grow flex flex-col lg:ml-[250px] transition-all duration-300">
+        <header class="bg-white shadow-sm p-4 flex justify-between items-center lg:hidden z-40">
+            <h2 class="text-xl font-bold">Admin Dashboard</h2>
+        </header>
+        <div class="p-6 md:p-8 flex-grow">
+            <section id="dashboard" class="section-content">
+                <h2 class="text-3xl font-bold mb-6">Dashboard Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-600">Total Locations</h3>
+                        <p id="stat-total-locations" class="text-4xl font-bold mt-2">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-600">Active Bookings</h3>
+                        <p id="stat-active-bookings" class="text-4xl font-bold mt-2">0</p>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-600">Upcoming Expirations</h3>
+                        <p id="stat-upcoming-expirations" class="text-4xl font-bold mt-2">0</p>
+                    </div>
+                     <div class="bg-white p-6 rounded-lg shadow">
+                        <h3 class="text-lg font-semibold text-gray-600">Total Revenue</h3>
+                        <p id="stat-total-revenue" class="text-3xl font-bold mt-2">Rp 0</p>
+                    </div>
+                </div>
+            </section>
+            
+            <section id="locations" class="section-content">
+                <h2 class="text-3xl font-bold mb-6">Storage Locations Management</h2>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr><th class="px-6 py-3 text-left">Location Name</th><th class="px-6 py-3 text-left">Address</th><th class="px-6 py-3 text-left">Capacity</th><th class="px-6 py-3 text-left">Features</th><th class="px-6 py-3 text-left">Actions</th></tr>
+                        </thead>
+                        <tbody id="locations-list-content"></tbody>
+                    </table>
+                </div>
+            </section>
+            
+            <section id="bookings" class="section-content">
+                 <h2 class="text-3xl font-bold mb-6">Bookings Management</h2>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr><th class="px-6 py-3 text-left">ID</th><th class="px-6 py-3 text-left">User</th><th class="px-6 py-3 text-left">Location</th><th class="px-6 py-3 text-left">Start Date</th><th class="px-6 py-3 text-left">Status</th><th class="px-6 py-3 text-left">Actions</th></tr>
+                        </thead>
+                        <tbody id="bookings-list-content"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="users" class="section-content">
+                 <h2 class="text-3xl font-bold mb-6">User Management</h2>
+                <div class="bg-white rounded-lg shadow p-4">
+                    <table class="min-w-full">
+                        <thead class="bg-gray-50">
+                            <tr><th class="px-6 py-3 text-left">ID</th><th class="px-6 py-3 text-left">Name</th><th class="px-6 py-3 text-left">Email</th><th class="px-6 py-3 text-left">Phone</th><th class="px-6 py-3 text-left">Actions</th></tr>
+                        </thead>
+                        <tbody id="users-list-content"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section id="qr-scanner" class="section-content"><h2 class="text-3xl font-bold mb-6">QR Scanner</h2></section>
+            <section id="messages" class="section-content"><h2 class="text-3xl font-bold mb-6">Messages</h2></section>
+            <section id="faqs-management" class="section-content"><h2 class="text-3xl font-bold mb-6">FAQs Management</h2></section>
+            <section id="vouchers-management" class="section-content"><h2 class="text-3xl font-bold mb-6">Vouchers Management</h2></section>
+            <section id="settings" class="section-content"><h2 class="text-3xl font-bold mb-6">Settings</h2></section>
+        </div>
+    </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-database-compat.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script src="/admin/admin.js"></script>
+</body>
+</html>
